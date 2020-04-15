@@ -3,8 +3,20 @@ const app = new Koa()
 const routing = require('./routes')
 const error = require('koa-json-error')
 const parameter = require('koa-parameter')
-const bodyparser = require('koa-bodyparser')
-const body = require('koa-better-body')
+const koaBody = require('koa-body')
+const mongoose = require('mongoose')
+
+/* -------------------------- Database -------------------------- */
+const { mongodbURL } = require('../config')
+mongoose.connect(
+  mongodbURL,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  (err) => {
+    if (err) throw err
+    console.log('mongodb connected')
+  }
+)
+mongoose.connection.on('error', console.error)
 
 /* -------------------------- middleware -------------------------- */
 // app.use(async (ctx, next) => {
@@ -18,14 +30,16 @@ const body = require('koa-better-body')
 //   }
 // })
 
-app.use(error({
-  postFormat: (err, {stack, ...rest}) => process.env.NODE_ENV === 'production' ? rest : {stack, ...rest}
-}))
+app.use(
+  error({
+    postFormat: (err, { stack, ...rest }) =>
+      process.env.NODE_ENV === 'production' ? rest : { stack, ...rest }
+  })
+)
 
 app.use(parameter(app))
 
-// app.use(bodyparser())
-app.use(body())
+app.use(koaBody())
 
 /* -------------------------- routing -------------------------- */
 routing(app)

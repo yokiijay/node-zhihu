@@ -1,21 +1,23 @@
+const UserModel = require('../models/UserModel')
+
 class UserController {
   constructor(){
     this.db = [
       {
         id: '0',
         name: 'yokiijay',
-        age: '24'
+        age: 24
       },
       {
         id: '1',
         name: 'robot',
-        age: '1'
+        age: 1
       }
     ]
   }
 
-  find(ctx){
-    ctx.body = this.db
+  async find(ctx){
+    ctx.response.body = await UserModel.find()
   }
 
   findById(ctx){
@@ -33,17 +35,19 @@ class UserController {
     ctx.body = fields
   }
 
-  create(ctx){
-    ctx.request.body = ctx.request.fields
+  async create(ctx){
     ctx.verifyParams({
       name: {
         type: 'string',
         required: true
       },
-      age: 'string'
+      age: {
+        type: 'number',
+        required: true
+      }
     })
-    this.db.push({id: (this.db[this.db.length-1].id*1+1).toString(), ...ctx.request.fields})
-    ctx.body = ctx.request.fields
+    const res = await new UserModel(ctx.request.body).save()
+    ctx.body = res
   }
 
   deleteById(ctx){
