@@ -1,0 +1,21 @@
+{
+  "name": "node-zhihu",
+  "version": "1.0.0",
+  "main": "app/index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development nodemon app"
+  },
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-better-body": "^3.3.9",
+    "koa-bodyparser": "^4.3.0",
+    "koa-json-error": "^3.1.2",
+    "koa-parameter": "^3.0.1",
+    "koa-router": "^8.0.8"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "nodemon": "^2.0.3"
+  }
+}
