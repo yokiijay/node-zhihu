@@ -1,3 +1,4 @@
+const path = require('path')
 const Koa = require('koa')
 const app = new Koa()
 const routing = require('./routes')
@@ -5,6 +6,7 @@ const error = require('koa-json-error')
 const parameter = require('koa-parameter')
 const koaBody = require('koa-body')
 const mongoose = require('mongoose')
+const static = require('koa-static')
 
 /* -------------------------- Database -------------------------- */
 const { mongodbURL } = require('../config')
@@ -19,16 +21,8 @@ mongoose.connect(
 mongoose.connection.on('error', console.error)
 
 /* -------------------------- middleware -------------------------- */
-// app.use(async (ctx, next) => {
-//   try {
-//     await next()
-//   }catch (err){
-//     ctx.status = err.status || err.statusCode || 500
-//     ctx.body = {
-//       message: err.message
-//     }
-//   }
-// })
+
+app.use(static(path.join(__dirname, 'public')))
 
 app.use(
   error({
@@ -39,7 +33,13 @@ app.use(
 
 app.use(parameter(app))
 
-app.use(koaBody())
+app.use(koaBody({
+  multipart: true,
+  formidable: {
+    uploadDir: path.join(__dirname, '/public/uploads'),
+    keepExtensions: true
+  }
+}))
 
 /* -------------------------- routing -------------------------- */
 routing(app)
