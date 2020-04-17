@@ -10,7 +10,10 @@ class UsersController {
 
   async findById(ctx){
     try {
-      const user = await UserModel.findById(ctx.params.id)
+      const { fields } = ctx.query // fields=locations;business;employments;educations
+      const select = '+' + fields.replace(/\;/g, ' +')
+      console.log( select )
+      const user = await UserModel.findById(ctx.params.id).select(select)
       if(!user) ctx.throw(404, '用户不存在')
       ctx.body = user
     }catch (err){
@@ -29,7 +32,7 @@ class UsersController {
       if(!user) { ctx.throw(404, '用户不存在') }
       ctx.body = user
     }catch (err){
-      ctx.throw(404, '用户不存在')
+      ctx.throw(403, err.message)
     }
   }
 
