@@ -21,6 +21,10 @@ router.post('/login', users.login)
 
 router.get('/:id/following', users.listFollowing)
 
+router.get('/:id/followers', users.listFollower)
+
 router.put('/following/:id', auth, users.follow)
+
+router.delete('/following/:id', auth, users.unfollow)
 
 module.exports = router

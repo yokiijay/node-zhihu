@@ -109,13 +109,35 @@ class UsersController {
     const isExist = me.following.find((item) => {
       return item.toString() === ctx.params.id
     })
-    if (!isExist) {
+    const isUser = await UserModel.findById(ctx.params.id)
+    if (!isExist && isUser) {
       me.following.push(ctx.params.id)
       await me.save()
       ctx.status = 204
+    } else if (!isUser) {
+      ctx.throw(403, '要关注的用户不存在')
     } else {
-      ctx.throw(403, '不能重复关注')
+      {
+        ctx.throw(403, '不能重复关注')
+      }
     }
+  }
+
+  async unfollow(ctx) {
+    const user = await UserModel.updateOne(
+      { _id: ctx.state.user._id },
+      { $pull: { following: ctx.params.id } }
+    )
+    if (user.nModified) {
+      ctx.status = 204
+    } else {
+      ctx.throw(403, '用户不存在')
+    }
+  }
+
+  async listFollower(ctx) {
+    const users = await UserModel.find({ following: ctx.params.id })
+    ctx.body = users
   }
 }
 
