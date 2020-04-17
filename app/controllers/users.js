@@ -94,7 +94,7 @@ class UsersController {
 
   async follow(ctx){
     try {
-      const me = await UserModel.findById(ctx.state.user._id).select('+following')
+      const me = await UserModel.findById(ctx.state.user._id).select('+following').exec()
       const isExist = me.following.find(item=>{
         return item.toString() === ctx.params.id
       })
@@ -106,6 +106,7 @@ class UsersController {
         return ctx.throw(403, '不能重复关注')
       }
     }catch (err){
+      console.log( err )
       ctx.throw(404, '用户不存在')
     }
   }
