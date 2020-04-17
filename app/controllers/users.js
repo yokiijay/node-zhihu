@@ -82,6 +82,33 @@ class UsersController {
     if(ctx.params.id !== ctx.state.user._id) ctx.throw(403, '没有权限')
     await next()
   }
+
+  async listFollowing(ctx){
+    try {
+      const user = await UserModel.findById(ctx.params.id).select('+following').populate('following')
+      ctx.body = user.following
+    }catch (err) {
+      ctx.throw(404, '用户不存在')
+    }
+  }
+
+  async follow(ctx){
+    try {
+      const me = await UserModel.findById(ctx.state.user._id).select('+following')
+      const isExist = me.following.find(item=>{
+        return item.toString() === ctx.params.id
+      })
+      if(!isExist){
+        me.following.push(ctx.params.id)
+        me.save()
+        ctx.status = 204
+      }else {
+        return ctx.throw(403, '不能重复关注')
+      }
+    }catch (err){
+      ctx.throw(404, '用户不存在')
+    }
+  }
   
 }
 

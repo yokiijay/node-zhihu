@@ -19,4 +19,8 @@ router.delete('/:id', auth, users.checkOwner, users.deleteById)
 
 router.post('/login', users.login)
 
+router.get('/:id/following', users.listFollowing)
+
+router.put('/following/:id', auth, users.follow)
+
 module.exports = router
