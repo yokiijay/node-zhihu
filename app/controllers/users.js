@@ -12,8 +12,8 @@ class UsersController {
     try {
       const { fields } = ctx.query // fields=locations;business;employments;educations
       const select = '+' + fields.replace(/\;/g, ' +')
-      console.log( select )
       const user = await UserModel.findById(ctx.params.id).select(select)
+      console.log( 'user',user )
       if(!user) ctx.throw(404, '用户不存在')
       ctx.body = user
     }catch (err){
@@ -94,7 +94,7 @@ class UsersController {
 
   async follow(ctx){
     try {
-      const me = await UserModel.findById(ctx.state.user._id).select('+following').exec()
+      const me = await UserModel.findById(ctx.state.user._id).select('+following')
       const isExist = me.following.find(item=>{
         return item.toString() === ctx.params.id
       })
@@ -103,10 +103,9 @@ class UsersController {
         me.save()
         ctx.status = 204
       }else {
-        return ctx.throw(403, '不能重复关注')
+        ctx.throw(403, '不能重复关注')
       }
     }catch (err){
-      console.log( err )
       ctx.throw(404, '用户不存在')
     }
   }
