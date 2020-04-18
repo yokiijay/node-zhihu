@@ -1,4 +1,4 @@
-const { Schema, Model } = require('mongoose')
+const { Schema, model } = require('mongoose')
 
 const TopicSchema = new Schema({
   __v: {type: Number, select: false},
@@ -7,6 +7,6 @@ const TopicSchema = new Schema({
   introduction: {type: String, select: false}
 })
 
-const TopicModel = new Model('Topic', TopicSchema)
+const TopicModel = model('Topic', TopicSchema)
 
-module.export = TopicModel
+module.exports = TopicModel
