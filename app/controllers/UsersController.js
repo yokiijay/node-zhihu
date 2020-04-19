@@ -20,8 +20,16 @@ class UsersController {
     }
   }
 
+  async filterFields(ctx, next){
+    const {fields=''} = ctx.query
+    const select = '+'+fields.replace(';', ' +')
+    ctx.state.select = select
+    delete ctx.query.fields
+    await next()
+  }
+
   async getUserByQuery(ctx) {
-    const users = await UserModel.find(ctx.query)
+    const users = await UserModel.find(ctx.query).select(ctx.state.select).populate('employments.company')
     ctx.body = users
   }
 

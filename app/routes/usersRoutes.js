@@ -6,7 +6,7 @@ const jwt = require('koa-jwt')
 
 const auth = jwt({secret})
 
-router.get('/', users.getUserByQuery)
+router.get('/', users.filterFields, users.getUserByQuery)
 
 router.get('/:id', users.getUserById)
 
