@@ -8,13 +8,13 @@ const UserSchema = new Schema({
   password: { type: String, required: true, select: false },
   __v: { type: Number, select: false },
   avatarUrl: { type: String },
-  locations: { type: [{ type: ObjectId }], select: false },
-  business: { type: ObjectId, select: false },
+  locations: { type: [{ type: ObjectId, ref: 'Topic' }], select: false },
+  business: { type: ObjectId, select: false, ref: 'Topic' },
   employments: {
     type: [
       {
-        company: { type: ObjectId },
-        job: { type: ObjectId }
+        company: { type: ObjectId, ref: 'Topic' },
+        job: { type: ObjectId, ref: 'Topic' }
       }
     ],
     select: false
@@ -22,8 +22,8 @@ const UserSchema = new Schema({
   educations: {
     type: [
       {
-        school: { type: ObjectId },
-        major: { type: ObjectId },
+        school: { type: ObjectId, ref: 'Topic' },
+        major: { type: ObjectId, ref: 'Topic' },
         diploma: { type: Number, enum: [1, 2, 3, 4, 5] },
         entranceYear: { type: Number },
         graduationYear: { type: Number }
@@ -37,6 +37,6 @@ const UserSchema = new Schema({
   }
 })
 
-const UserModel = model('Users', UserSchema)
+const UserModel = model('User', UserSchema)
 
 module.exports = UserModel

@@ -9,10 +9,8 @@ class UsersController {
 
   async getUserById(ctx) {
     try {
-      const { fields } = ctx.query // fields=locations;business;employments;educations
-      const select = '+' + fields.replace(/\;/g, ' +')
-      const user = await UserModel.findById(ctx.params.id).select(select)
-      console.log('user', user)
+      const populate = ctx.state.select.replace('+', '')
+      const user = await UserModel.findById(ctx.params.id).select(ctx.state.fields).populate(populate)
       if (!user) ctx.throw(404, '用户不存在')
       ctx.body = user
     } catch (err) {
@@ -20,16 +18,19 @@ class UsersController {
     }
   }
 
-  async filterFields(ctx, next){
-    const {fields=''} = ctx.query
-    const select = '+'+fields.replace(';', ' +')
+  async filterFields(ctx, next) {
+    const { fields = '' } = ctx.query
+    const select = '+' + fields.replace(/\;/g, ' +')
     ctx.state.select = select
     delete ctx.query.fields
     await next()
   }
 
   async getUserByQuery(ctx) {
-    const users = await UserModel.find(ctx.query).select(ctx.state.select).populate('employments.company')
+    const populate = ctx.state.select.replace(/\+/g, '')
+    const users = await UserModel.find(ctx.query)
+    .select(ctx.state.select)
+    .populate(populate)
     ctx.body = users
   }
 
@@ -103,7 +104,7 @@ class UsersController {
 
   async checkUserExist(ctx, next) {
     const user = await UserModel.findById(ctx.params.id)
-    if(!user) ctx.throw(403, '用户不存在')
+    if (!user) ctx.throw(403, '用户不存在')
     await next()
   }
 

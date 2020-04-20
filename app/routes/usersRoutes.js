@@ -8,7 +8,7 @@ const auth = jwt({secret})
 
 router.get('/', users.filterFields, users.getUserByQuery)
 
-router.get('/:id', users.getUserById)
+router.get('/:id', users.filterFields, users.getUserById)
 
 router.patch('/:id', auth, users.checkOwner, users.updateUser)
 
