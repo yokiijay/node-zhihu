@@ -26,4 +26,8 @@ router.put('/following/:id', auth, users.follow)
 
 router.delete('/following/:id', auth, users.unfollow)
 
+router.get('/:id/followingTopics', users.getFollowingTopics)
+
+router.put('/followingTopics/:id', auth, users.followTopic)
+
 module.exports = router

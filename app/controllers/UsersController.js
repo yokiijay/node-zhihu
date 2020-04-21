@@ -1,6 +1,7 @@
 const UserModel = require('../models/UserModel')
 const jsonwebtoken = require('jsonwebtoken')
 const { secret } = require('../../config')
+const TopicModel = require('../models/TopicModel')
 
 class UsersController {
   async getAllUsers(ctx) {
@@ -133,7 +134,7 @@ class UsersController {
       ctx.throw(403, '要关注的用户不存在')
     } else {
       {
-        ctx.throw(403, '不能重复关注')
+        ctx.throw(409, '不能重复关注')
       }
     }
   }
@@ -153,6 +154,33 @@ class UsersController {
   async getFollowers(ctx) {
     const users = await UserModel.find({ following: ctx.params.id })
     ctx.body = users
+  }
+
+  async getFollowingTopics(ctx){
+    const user = await UserModel.findById(ctx.params.id).select('+followingTopics').populate('followingTopics')
+    if(user){
+      ctx.body = user.followingTopics
+    }else {
+      ctx.throw(404, '用户不存在')
+    }
+  }
+
+  async followTopic(ctx) {
+    const me = await UserModel.findById(ctx.state.user._id).select('+followingTopics')
+    const isExist = me.followingTopics.find(item=>{
+      return item.toString() === ctx.params.id
+    })
+    const hasTopic = await TopicModel.findById(ctx.params.id)
+
+    if(!isExist&&hasTopic) {
+      me.followingTopics.push(ctx.params.id)
+      await me.save()
+      ctx.status = 204
+    }else if(!hasTopic) {
+      ctx.throw(403, '话题不存在')
+    }else {
+      ctx.throw(409, '不能重复关注话题')
+    }
   }
 }
 

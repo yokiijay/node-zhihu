@@ -32,7 +32,11 @@ const UserSchema = new Schema({
     select: false
   },
   following: {
-    type: [{type: ObjectId, ref: 'Users'}],
+    type: [{type: ObjectId, ref: 'User'}],
+    select: false
+  },
+  followingTopics: {
+    type: [{type: ObjectId, ref: 'Topic'}],
     select: false
   }
 })
