@@ -12,4 +12,6 @@ router.delete('/:id', topics.checkTopicExist, topics.deleteTopic)
 
 router.patch('/:id', topics.updateTopic)
 
+router.get('/:id/questions', topics.checkTopicExist, topics.getQuestions)
+
 module.exports = router

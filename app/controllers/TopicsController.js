@@ -1,4 +1,5 @@
 const TopicModel = require('../models/TopicModel')
+const QuestionModel = require('../models/QuestionModel')
 
 class TopicsController {
   async getTopicsByQuery(ctx) {
@@ -97,6 +98,12 @@ class TopicsController {
     )
     ctx.body = topic
   }
+
+  async getQuestions(ctx){
+    const questions = await QuestionModel.find({topics: ctx.params.id})
+    ctx.body = questions
+  }
+
 }
 
 module.exports = new TopicsController()

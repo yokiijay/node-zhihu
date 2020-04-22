@@ -30,4 +30,6 @@ router.get('/:id/followingTopics', users.getFollowingTopics)
 
 router.put('/followingTopics/:id', auth, users.followTopic)
 
+router.get('/:id/questions', users.getUserQuestions)
+
 module.exports = router

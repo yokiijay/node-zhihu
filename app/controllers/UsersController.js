@@ -2,6 +2,7 @@ const UserModel = require('../models/UserModel')
 const jsonwebtoken = require('jsonwebtoken')
 const { secret } = require('../../config')
 const TopicModel = require('../models/TopicModel')
+const QuestionModel = require('../models/QuestionModel')
 
 class UsersController {
   async getAllUsers(ctx) {
@@ -181,6 +182,12 @@ class UsersController {
     }else {
       ctx.throw(409, '不能重复关注话题')
     }
+  }
+
+  async getUserQuestions(ctx) {
+    const questions = await QuestionModel.find({questioner: ctx.params.id})
+    if(!questions) ctx.throw(404, '该用户没有提问')
+    ctx.body = questions
   }
 }
 
