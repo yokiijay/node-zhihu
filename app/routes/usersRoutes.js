@@ -30,4 +30,6 @@ router.get('/:id/followingTopics', users.getFollowingTopics)
 
 router.put('/followingTopics/:id', auth, users.followTopic)
 
+router.delete('/followingTopics/:id', auth, users.unfollowTopic)
+
 module.exports = router

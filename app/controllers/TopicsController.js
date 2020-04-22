@@ -1,4 +1,5 @@
 const TopicModel = require('../models/TopicModel')
+const UserModel = require('../models/UserModel')
 
 class TopicsController {
   async getTopicsByQuery(ctx) {
@@ -64,7 +65,7 @@ class TopicsController {
 
   async checkTopicExist(ctx, next) {
     const topic = await TopicModel.findById(ctx.params.id)
-    if (!topic) ctx.throw(403, '话题不存在')
+    if (!topic) ctx.throw(404, '话题不存在')
     await next()
   }
 
@@ -96,6 +97,25 @@ class TopicsController {
       ctx.request.body
     )
     ctx.body = topic
+  }
+
+  async getFollowers(ctx){
+    const users = await UserModel.find({ followingTopics: ctx.params.id })
+    if(!users||!users.length) return ctx.throw(404, '目前没有人关注该话题')
+    ctx.body = users
+  }
+
+  async getFollowedTopics(ctx){
+    const users = await UserModel.find({ followingTopics: {  $exists: true, $not: {$size: 0} } }).populate('followingTopics')
+    const topics = []
+    users.forEach(item=>{
+      item.followingTopics.forEach(item=>{
+        topics.push(item)
+      })
+    })
+
+    if(!users||!users.length) ctx.throw(404, '没有被关注的话题')
+    ctx.body = topics
   }
 }
 

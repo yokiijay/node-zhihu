@@ -182,6 +182,24 @@ class UsersController {
       ctx.throw(409, '不能重复关注话题')
     }
   }
+
+  async unfollowTopic(ctx) {
+    const me = await UserModel.findById(ctx.state.user._id).select('+followingTopics')
+    const isExist = me.followingTopics.find(item=>{
+      return item.toString() === ctx.params.id
+    })
+    const hasTopic = await TopicModel.findById(ctx.params.id)
+
+    if(isExist&&hasTopic) {
+      me.followingTopics = me.followingTopics.filter(item=>(
+        item.toString() !== ctx.params.id
+      ))
+      await me.save()
+      ctx.status = 204
+    }else {
+      ctx.throw(404, '话题不存在')
+    }
+  }
 }
 
 module.exports = new UsersController()
