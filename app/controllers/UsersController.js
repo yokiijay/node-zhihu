@@ -12,7 +12,9 @@ class UsersController {
   async getUserById(ctx) {
     try {
       const populate = ctx.state.select.replace('+', '')
-      const user = await UserModel.findById(ctx.params.id).select(ctx.state.fields).populate(populate)
+      const user = await UserModel.findById(ctx.params.id)
+        .select(ctx.state.fields)
+        .populate(populate)
       if (!user) ctx.throw(404, '用户不存在')
       ctx.body = user
     } catch (err) {
@@ -31,8 +33,8 @@ class UsersController {
   async getUserByQuery(ctx) {
     const populate = ctx.state.select.replace(/\+/g, '')
     const users = await UserModel.find(ctx.query)
-    .select(ctx.state.select)
-    .populate(populate)
+      .select(ctx.state.select)
+      .populate(populate)
     ctx.body = users
   }
 
@@ -157,37 +159,61 @@ class UsersController {
     ctx.body = users
   }
 
-  async getFollowingTopics(ctx){
-    const user = await UserModel.findById(ctx.params.id).select('+followingTopics').populate('followingTopics')
-    if(user){
+  async getFollowingTopics(ctx) {
+    const user = await UserModel.findById(ctx.params.id)
+      .select('+followingTopics')
+      .populate('followingTopics')
+    if (user) {
       ctx.body = user.followingTopics
-    }else {
+    } else {
       ctx.throw(404, '用户不存在')
     }
   }
 
   async followTopic(ctx) {
-    const me = await UserModel.findById(ctx.state.user._id).select('+followingTopics')
-    const isExist = me.followingTopics.find(item=>{
+    const me = await UserModel.findById(ctx.state.user._id).select(
+      '+followingTopics'
+    )
+    const isExist = me.followingTopics.find((item) => {
       return item.toString() === ctx.params.id
     })
     const hasTopic = await TopicModel.findById(ctx.params.id)
 
-    if(!isExist&&hasTopic) {
+    if (!isExist && hasTopic) {
       me.followingTopics.push(ctx.params.id)
       await me.save()
       ctx.status = 204
-    }else if(!hasTopic) {
+    } else if (!hasTopic) {
       ctx.throw(403, '话题不存在')
-    }else {
+    } else {
       ctx.throw(409, '不能重复关注话题')
     }
   }
 
   async getUserQuestions(ctx) {
-    const questions = await QuestionModel.find({questioner: ctx.params.id})
-    if(!questions) ctx.throw(404, '该用户没有提问')
+    const questions = await QuestionModel.find({ questioner: ctx.params.id })
+    if (!questions) ctx.throw(404, '该用户没有提问')
     ctx.body = questions
+  }
+
+  async unfollowTopic(ctx) {
+    const me = await UserModel.findById(ctx.state.user._id).select(
+      '+followingTopics'
+    )
+    const isExist = me.followingTopics.find((item) => {
+      return item.toString() === ctx.params.id
+    })
+    const hasTopic = await TopicModel.findById(ctx.params.id)
+
+    if (isExist && hasTopic) {
+      me.followingTopics = me.followingTopics.filter(
+        (item) => item.toString() !== ctx.params.id
+      )
+      await me.save()
+      ctx.status = 204
+    } else {
+      ctx.throw(404, '话题不存在')
+    }
   }
 }
 
