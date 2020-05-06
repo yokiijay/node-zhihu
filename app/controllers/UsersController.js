@@ -192,7 +192,7 @@ class UsersController {
 
   async getUserQuestions(ctx) {
     const questions = await QuestionModel.find({ questioner: ctx.params.id })
-    if (!questions) ctx.throw(404, '该用户没有提问')
+    if (!questions.length) ctx.throw(404, '该用户没有提问')
     ctx.body = questions
   }
 

@@ -18,7 +18,7 @@ class QuestionController {
 
     const questions = await QuestionModel.find(ctx.query).limit(perPage).skip(perPage*(page-1)).select(ctx.state.select)
 
-    if(!questions) ctx.throw(404, '目前还没有提问哦')
+    if(!questions.length) ctx.throw(404, '目前还没有提问哦')
     const count = await QuestionModel.estimatedDocumentCount()
     ctx.body = {
       questions,

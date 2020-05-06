@@ -17,6 +17,8 @@ class AnswerController {
     .limit(perPage)
     .skip(perPage * (page - 1))
 
+    if(!answers.length) ctx.throw(404, '该问题没有找到答案')
+
     const count = await AnswerModel.estimatedDocumentCount()
     ctx.body = {
       answers,
