@@ -36,6 +36,16 @@ class AnswerController {
     }).save()
     ctx.body = anwser
   }
+
+  async checkAnswerExist(ctx, next){
+    const answer = await AnswerModel.findById(ctx.params.id).select('+answerer')
+    if(!answer) ctx.throw(404, '答案不存在')
+    if(ctx.params.questionId && ctx.params.questionId !== answer.questionId){
+      ctx.throw(404, '该问题下没有此答案')
+    }
+    ctx.state.answer = answer
+    await next()
+  }
 }
 
 module.exports = new AnswerController()

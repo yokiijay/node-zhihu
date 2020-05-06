@@ -38,7 +38,19 @@ const UserSchema = new Schema({
   followingTopics: {
     type: [{type: ObjectId, ref: 'Topic'}],
     select: false
-  }
+  },
+  likedAnswers: {
+    type: [{type: ObjectId, ref: 'Answer'}],
+    select: false
+  },
+  disLikedAnswers: {
+    type: [{type: ObjectId, ref: 'Answer'}],
+    select: false
+  },
+  collectedAnswers: {
+    type: [{type: ObjectId, ref: 'Answer'}],
+    select: false
+  },
 })
 
 const UserModel = model('User', UserSchema)

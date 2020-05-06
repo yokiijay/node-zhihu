@@ -3,6 +3,7 @@ const jsonwebtoken = require('jsonwebtoken')
 const { secret } = require('../../config')
 const TopicModel = require('../models/TopicModel')
 const QuestionModel = require('../models/QuestionModel')
+const AnswerModel = require('../models/AnswerModel')
 
 class UsersController {
   async getAllUsers(ctx) {
@@ -214,6 +215,86 @@ class UsersController {
     } else {
       ctx.throw(404, '话题不存在')
     }
+  }
+  
+  async likeAnswer(ctx){
+    const me = await UserModel.findById(ctx.state.user._id).select('+likedAnswers')
+    const exist = me.likedAnswers.find(id=>id.toString()===ctx.params.id)
+    if(exist) ctx.throw(403, '您已赞过')
+    me.likedAnswers.push(ctx.params.id)
+    await me.save()
+    await AnswerModel.findByIdAndUpdate(ctx.params.id, { $inc: { voteCount: 1 } })
+    ctx.status = 204
+  }
+  
+  async unlikeAnswer(ctx){
+    const me = await UserModel.findById(ctx.state.user._id).select('+likedAnswers')
+    const exist = me.likedAnswers.find(id=>id.toString()===ctx.params.id)
+    if(!exist) ctx.throw(403, '还未赞过')
+    me.likedAnswers = me.likedAnswers.filter(id=>{
+      return id.toString()!==ctx.params.id
+    })
+    await me.save()
+    await AnswerModel.findByIdAndUpdate(ctx.params.id, { $inc: { voteCount: -1 } })
+    ctx.status = 204
+  }
+  
+  async disLikeAnswer(ctx){
+    const me = await UserModel.findById(ctx.state.user._id).select('+disLikedAnswers')
+    const exist = me.disLikedAnswers.find(id=>id.toString()===ctx.params.id)
+    if(exist) ctx.throw(403, '您已踩过')
+    me.disLikedAnswers.push(ctx.params.id)
+    await me.save()
+    ctx.status = 204
+  }
+  
+  async unDisLikeAnswer(ctx){
+    const me = await UserModel.findById(ctx.state.user._id).select('+disLikedAnswers')
+    const exist = me.disLikedAnswers.find(id=>id.toString()===ctx.params.id)
+    if(!exist) ctx.throw(403, '您已取消踩')
+    me.disLikedAnswers = me.disLikedAnswers.filter(id=>{
+      return id.toString()!==ctx.params.id
+    })
+    await me.save()
+    ctx.status = 204
+  }
+
+  async getLikedAnswers(ctx){
+    const user = await UserModel.findById(ctx.params.id).select('+likedAnswers').populate('likedAnswers')
+    if(!user) ctx.throw(404, '用户不存在')
+    ctx.body = user.likedAnswers
+  }
+
+  async getDisLikedAnswers(ctx){
+    const user = await UserModel.findById(ctx.params.id).select('+disLikedAnswers').populate('disLikedAnswers')
+    if(!user) ctx.throw(404, '用户不存在')
+    ctx.body = user.disLikedAnswers
+  }
+
+  async collectAnswer(ctx){
+    const me = await UserModel.findById(ctx.state.user._id).select('+collectedAnswers')
+    const exist = me.collectedAnswers.find(id=>id.toString()===ctx.params.id)
+    if(exist) ctx.throw(403, '您已收藏过了')
+    me.collectedAnswers.push(ctx.params.id)
+    await me.save()
+    ctx.status = 204
+  }
+
+  async unCollectAnswer(ctx){
+    const me = await UserModel.findById(ctx.state.user._id).select('+collectedAnswers')
+    const exist = me.collectedAnswers.find(id=>id.toString()===ctx.params.id)
+    if(!exist) ctx.throw(403, '您未收藏过')
+    me.collectedAnswers = me.collectedAnswers.filter(id=>{
+      return id.toString()!==ctx.params.id
+    })
+    await me.save()
+    ctx.status = 204
+  }
+
+  async getCollectedAnswers(ctx){
+    const user = await UserModel.findById(ctx.params.id).select('+collectedAnswers').populate('collectedAnswers')
+    if(!user) ctx.throw(404, '用户不存在')
+    ctx.body = user.collectedAnswers
   }
 }
 

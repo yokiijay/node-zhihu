@@ -12,7 +12,7 @@ const static = require('koa-static')
 const { mongodbURL } = require('../config')
 mongoose.connect(
   mongodbURL,
-  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
+  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false },
   (err) => {
     if (err) throw err
     console.log('mongodb connected')
