@@ -12,7 +12,7 @@ class AnswerController {
 
     const answers = await AnswerModel.find({
       questionId: ctx.params.questionId,
-      ...(q ? {content: { $regex: new RegExp(`${q}`,'g') }} : null)
+      ...(q ? {content: { $regex: new RegExp(`${q}`,'ig') }} : null)
     })
     .limit(perPage)
     .skip(perPage * (page - 1))
